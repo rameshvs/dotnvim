@@ -36,12 +36,17 @@ Plug 'frankier/neovim-colors-solarized-truecolor-only'
 " set t_Co=16
 " let g:solarized_termcolors=16
 " set background=dark
+set t_8f=[38;2;%lu;%lu;%lum
+set t_8b=[48;2;%lu;%lu;%lum
+
 
 " paren match highlighting
 Plug 'kien/rainbow_parentheses.vim'
 
 " press any chord (key pair) to send commands
 Plug 'kana/vim-arpeggio'
+
+let g:arpeggio_timeoutlen = 80
 
 " do shell (unix) stuff in vim
 Plug 'tpope/vim-eunuch'
@@ -63,14 +68,10 @@ nnoremap <silent> <Plug>NetrwBrowseX :call netrw#BrowseX(expand((exists("g:netrw
 
 
 " Move (sneak) around a file using \f
-Plug 'justinmk/vim-sneak'
+Plug 'easymotion/vim-easymotion'
 
-
-let g:sneak#label = 1        " show where you're sneaking to
-let g:sneak#use_ic_scs = 1   " ???
-let g:sneak#absolute_dir = 1 " ???
-map <leader>f <Plug>Sneak_s
-map <leader>F <Plug>Sneak_S
+map <Leader> <Plug>(easymotion-prefix)
+let g:EasyMotion_keys= "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWZYZ0123456789;'"
 
 " git commands made easy
 Plug 'tpope/vim-fugitive'
