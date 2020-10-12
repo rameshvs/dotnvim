@@ -21,9 +21,26 @@ call plug#begin('~/.local/share/nvim/bundle')
 " FuZzy Find!
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
+" [Buffers] Jump to the existing window if possible
+let g:fzf_buffers_jump = 1
+nmap <C-b> :Buffers<CR>
+nmap <C-p> :call fzf#vim#files(ProjectRootGuess())<CR>
+
+" The uncompromising Python formatter
+Plug 'psf/black'
+
+" background (async) linting
+Plug 'dense-analysis/ale'
+
+let g:ale_linters = {
+            \'python': ['flake8', 'black'],
+            \}
 
 " makes it easier to comment stuff out
 Plug 'tpope/vim-commentary'
+
+" provides a projectroot function
+Plug 'dbakker/vim-projectroot'
 
 " enables repeating of plugin commands
 Plug 'tpope/vim-repeat'
@@ -60,6 +77,9 @@ Plug 'justinmk/vim-gtfo'
 "
 Plug 'tpope/vim-unimpaired'
 
+" Better javascript indentation + formatting
+Plug 'pangloss/vim-javascript'
+
 " Disable netrw, but autoload it for `gx`.
 let g:loaded_netrwPlugin = 0
 nmap gx <Plug>NetrwBrowseX
@@ -67,11 +87,11 @@ nnoremap <silent> <Plug>NetrwBrowseX :call
 nnoremap <silent> <Plug>NetrwBrowseX :call netrw#BrowseX(expand((exists("g:netrw_gx")? g:netrw_gx : '<cfile>')),netrw#CheckIfRemote())<CR>
 
 
-" Move (sneak) around a file using \f
+" Move around a file using \f
 Plug 'easymotion/vim-easymotion'
-
 map <Leader> <Plug>(easymotion-prefix)
-let g:EasyMotion_keys= "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWZYZ0123456789;'"
+let g:EasyMotion_keys='abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ;[]\'
+let g:EasyMotion_grouping=1
 
 " git commands made easy
 Plug 'tpope/vim-fugitive'
@@ -278,6 +298,25 @@ vmap <C-Down> ]egv
 " Indent/dedent multiple lines in visual mode
 vnoremap <C-Right> >gv
 vnoremap <C-Left> <gv
+
+"""""""""""""
+" FZF magic "
+"""""""""""""
+" Adapted from https://github.com/junegunn/fzf.vim#example-advanced-ripgrep-integration
+function! RipgrepFzf(query, fullscreen)
+  let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case %s || true'
+  let query = a:query
+  if query == ""
+    let query = expand("<cword>")
+  endif
+  let initial_command = printf(command_fmt, shellescape(query))
+  let reload_command = printf(command_fmt, '{q}')
+  let working_path = ProjectRootGuess()
+  let spec = {'dir': working_path, 'options': ['--phony', '--query', query, '--bind', 'change:reload:'.reload_command]}
+  call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
+endfunction
+
+command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
 
 """""""""""""""""""""
 " Autocommand stuff "
